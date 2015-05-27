@@ -10,7 +10,7 @@ related function (which are in the package `pgeo`)
 
 ### Additive partitioning
 
-- 'addpart' partitions biodiversity effects following Loreau and Hectors scheme.
+- `addpart` partitions biodiversity effects following Loreau and Hectors scheme.
 
 ### Biodiversity indices
 
