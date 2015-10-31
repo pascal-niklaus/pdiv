@@ -108,14 +108,14 @@ calcFD <- function(communities = NULL, traits=NULL, distance="euclidean",
     rownames(traits) <- as.character(traits[,sp.col.trt]);
 
     ## remove all species from trait tree that are not in a community
-    if(shrink.tree) {
+    if(shrink.tree) {        
         sp.to.keep <- which(!is.na( 
             match(rownames(traits),
                   as.character(communities[,sp.col.com]) )
             ))
-        traits<-traits[sp.to.keep,-sp.col.trt];
+        traits<-traits[sp.to.keep,-sp.col.trt,drop=FALSE];
     } else {
-        traits<-traits[,-sp.col.trt];
+        traits<-traits[,-sp.col.trt,drop=FALSE];
     }
 
     ## calculate trait tree

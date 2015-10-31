@@ -32,10 +32,12 @@ plus a few related indiced.
 
 These functions calculate functional and phylogenetic diversity as total branch length
 of a functional trait dendrogram or a phylogenetic tree, following Petchey \& Gastons 2002 
-scheme (including their 2006 update)
+scheme (including their 2006 update). Also, a function to calculate mean phylogenetic distances,
+with and without abundance weighing, is provided (Warwick and Clark 1995).
 
 - `calcFD(...)`
 - `calcPD(...)`
+- `calcMPD(...)`
 
 ## Installation
 
