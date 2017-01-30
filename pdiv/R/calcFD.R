@@ -68,7 +68,9 @@
 #'
 #' Petchey OL \& Gaston KJ (2002) Functional diversity (FD), species
 #' richness and community composition. Ecology Letters 5: 402--411.
-#' 
+#'
+#' @importFrom stats dist
+#' @importFrom stats hclust
 #' @author Pascal Niklaus \email{pascal.niklaus@@ieu.uzh.ch}
 #' @importFrom ape as.phylo
 #' @export    

@@ -8,9 +8,12 @@ related function (which are in the package `pgeo`)
 
 ## Groups of functions 
 
-### Additive partitioning
+### Additive and tripartite partitioning
 
 - `addpart` partitions biodiversity effects following Loreau and Hectors scheme.
+- `tripart` partitions biodiversity effects following Fox' scheme.
+
+Both functions support parallelization.
 
 ### Biodiversity indices
 
@@ -27,6 +30,11 @@ plus a few related indiced.
 
 - `communityFromMatrix(...)`
 - `communityToMatrix(...)`
+
+### Niche breadth and overlap
+
+- `levinsB` calculates niche breadth as defined by Levins
+- `prop.sim` calculates Colwell and Futuyma's proportional similarity index 
 
 ### Functional and phylogenetic diversity
 

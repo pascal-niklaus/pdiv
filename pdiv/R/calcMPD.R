@@ -64,6 +64,8 @@
 #' ## 109 109  37 385 385 385  97 109 109 109
 #' 
 #' @author Pascal Niklaus \email{pascal.niklaus@@ieu.uzh.ch}
+#' @importFrom utils combn
+#' @importFrom stats weighted.mean
 #' @export 
 calcMPD <- function(
     communities = NULL,

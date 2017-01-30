@@ -26,13 +26,13 @@ present by means of two separate columns for community and species,
 plus an optional column with abundances.}
 
 \item{column.with.community}{column containing the community code,
-specified as column number. Defaults to \code{1}. Can be set to
+specified as column number or name of the column. Defaults to \code{1}. Can be set to
 \code{NA} if the community code is stored as row name.}
 
 \item{column.with.species}{column containing the species codes,
 either specified as column number of name. Defaults to \code{2}.}
 
-\item{column.with.abundances}{column with species abundances, if
+\item{column.with.abundances}{column with species abundances, as name or integer, if
 these are provided (default \code{NULL}).}
 
 \item{keep.abundances}{logical determining whether abundances are converted

@@ -90,3 +90,4 @@ calcPD <- function(communities = NULL, tree=NULL, which=c("PD"), format="default
     }
     rr;
 }
+

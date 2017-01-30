@@ -12,11 +12,11 @@
 #' present by means of two separate columns for community and species,
 #' plus an optional column with abundances.
 #' @param column.with.community column containing the community code,
-#' specified as column number. Defaults to \code{1}. Can be set to
+#' specified as column number or name of the column. Defaults to \code{1}. Can be set to
 #' \code{NA} if the community code is stored as row name.
 #' @param column.with.species column containing the species codes,
 #' either specified as column number of name. Defaults to \code{2}.
-#' @param column.with.abundances column with species abundances, if
+#' @param column.with.abundances column with species abundances, as name or integer, if
 #' these are provided (default \code{NULL}).
 #' @param columns.with.species Columns of data matrix containing
 #' species presence data. Specified in numeric format. Defaults to all
@@ -82,6 +82,13 @@ communityToMatrix <- function(
     community.column.name = "community",
     species.missing = 0)
 {
+    if(is.character(column.with.community))
+        column.with.abundances <- match(column.with.community,names(cc))
+    if(is.character(column.with.species))
+        column.with.abundances <- match(column.with.species,names(cc))
+    if(is.character(column.with.abundances))
+        column.with.abundances <- match(column.with.abundances,names(cc))    
+        
     abu <- if(is.null(column.with.abundances)) {
         rep(1,nrow(cc))
     } else {
@@ -92,16 +99,18 @@ communityToMatrix <- function(
     com <- sort(unique(cc[,column.with.community]))
     sp  <- sort(unique(cc[,column.with.species]))
     x <- as.data.frame(
-        matrix(data=species.missing,
-               nrow=length(com),
-               ncol=length(sp)))
+        matrix(data = species.missing,
+               nrow = length(com),
+               ncol = length(sp)))
     colnames(x) <- sp
     rownames(x) <- com
+
     for(i in 1:nrow(x)) {
         cidx <- cc$com == com[i]
         x[i,] <- 
-            sapply(match(sp,cc$species[cidx]),
-                   function(x) if(is.na(x)) species.missing else abu[cidx][x])
+            sapply(match(as.character(sp),cc[cidx,column.with.species]),
+                   function(x) 
+                       if(is.na(x)) species.missing else abu[cidx][x])
     }
     if(community.in.column) {
         x[[community.column.name]] <- row.names(x)

@@ -21,3 +21,12 @@ NULL
 #' @format object of class \code{phylo}
 #' @author Pascal Niklaus
 NULL
+
+#' @name divpart
+#' @title Made-up example to demonstrate addpart and tripart
+#' @description Biomass of species in plots differing in composition. Used to demonstrate partitioning schemes
+#' for net biodiversity effects (see \code{addpart} and \code{tripart}).
+#' @docType data
+#' @format object of class \code{data.frame}
+#' @author Pascal Niklaus
+NULL
