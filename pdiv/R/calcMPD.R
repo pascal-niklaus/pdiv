@@ -209,18 +209,3 @@ calcMPD <- function(
     rr;
 }
 
-
-if(0) { # for step by step testing 
-    library(pdiv)
-    data(composition.example)
-    data(phylotree.example)
-    communities <- composition.example
-    tree <- phylotree.example
-    which <- "MPD"
-    format <- "default"
-    scale <- 1
-    abundance <- TRUE
-
-    communities$abu <- 1
-    
-}
