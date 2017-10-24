@@ -21,11 +21,11 @@
 #' but not in \code{EFGH}. The composition codes can contain
 #' additional characters as long as the above rule is met,
 #' e.g. \code{A|B|C|D} would work as well.
-#' 
+#'
 #' Monoculture biomass (the reference for the underlying relative
 #' yield calculation) is calculated as mean of all the monoculture
-#' plots, excluding \code{NA}s. 
-#' 
+#' plots, excluding \code{NA}s.
+#'
 #' Relative yields, on which the additive partitioning scheme bases,
 #' cannot be calculated for communities that contain species with zero
 #' or unknown monoculture biomass. For such plots, the complementarity
@@ -40,7 +40,7 @@
 #' platform other than Windows and the library \code{parallel} is
 #' installed, the processing of the different groups is parallelized
 #' on different processor cores.
-#' 
+#'
 #' @param data Data frame describing the composition of plant
 #'     communities, on a per-species basis
 #' @param depmix A 'model formula' describing the structure of the
@@ -71,19 +71,21 @@
 #'     with a right hand side only model formula.
 #' @return A data frame containing columns for plant species mixture,
 #'     plot, and the computed complementarity and selection effects.
-#' 
+#'
 #' @examples
 #'
 #' data(divpart)
 #' # additive partitioning
 #' addpart(m ~ comp/sp+plot, data = divpart, groups = ~group)
 #' # tripartite partitioning
-#' tripart(m ~ comp/sp+plot, data = divpart, groups = ~group) 
-#' 
+#' tripart(m ~ comp/sp+plot, data = divpart, groups = ~group)
+#'
 #' @references Loreau M \& Hector A (2001) Partitioning selection and
-#' complementarity in biodiversity experiments. Nature 412, 72-76
-#' @references Fox (2005) Interpreting the selection effect of biodiversity on
-#' ecosystem functioning. Ecology Letters 8, 846--856
+#'     complementarity in biodiversity experiments. Nature 412, 72-76
+#'
+#' @references Fox (2005) Interpreting the selection effect of
+#'     biodiversity on ecosystem functioning. Ecology Letters 8,
+#'     846--856
 #'
 #' @author Pascal Niklaus \email{pascal.niklaus@@ieu.uzh.ch}
 #'
@@ -92,8 +94,10 @@
 #' @export
 addpart <- function(depmix,
                     data,
-                    name.CE = NULL,name.SE = NULL,
-                    excl.zeroes = FALSE, groups = NULL)
+                    name.CE = NULL,
+                    name.SE = NULL,
+                    excl.zeroes = FALSE,
+                    groups = NULL)
 {
     .divpart(depmix = depmix,
              d = data,
@@ -124,9 +128,9 @@ tripart <- function(depmix,
              scheme = "tp")
 }
 
-## internal function called by addpart and tripart
+## private function called by addpart and tripart
 ## (note that depmix and groups are evaluated in the frame of the caller
-## of addpart and tripart (i.e the parent's parent frame)
+## of addpart and tripart, i.e the parent's parent frame)
 .divpart <- function(depmix,
                      d,
                      name.CE = NULL,
@@ -142,74 +146,75 @@ tripart <- function(depmix,
         (Sys.info()["sysname"] != "Windows") &&
         requireNamespace("parallel")
     myapply <- if(parallel)
-        function(x,fun) parallel::mclapply(x, fun,mc.cores = parallel::detectCores())
-    else 
-        lapply
+                   function(x,fun)
+                       parallel::mclapply(x, fun, mc.cores = parallel::detectCores())
+               else
+                   lapply
 
     ## evaluate formula in caller context of addpart and tripart
     if(!is.null(groups)) {
-        if(class(groups) != "formula" || length(groups)!=2)
-            stop("formula <",deparse(groups),
-                 "> for 'groups' should be a right-hand side formula")
-        d.grouping <- eval(model.frame(groups,d),parent.frame(2))
+        if(class(groups) != "formula" || length(groups) != 2)
+            stop("argument 'groups' (",deparse(groups),
+                 ") should be a right-hand side formula")
+        d.grouping <- eval(model.frame(groups, d), parent.frame(2))
     }
-    d <- eval(model.frame(depmix,d),parent.frame(2))
-        
+    d <- eval(model.frame(depmix,d), parent.frame(2))
+
     ## create list with data groups (dlist)
     if(is.null(groups))
         dlist <- list(all = d)
-    else     
+    else
         dlist <- split(
             cbind(d.grouping,d),
-            f = .factorsToNum(d.grouping))
-        
+            f = .columnsToNum(d.grouping))
+
     ## check for formula structure
-    if(length(depmix)!=3
-       || length(depmix[[3]][[2]])!=3
-       || length(depmix[[3]][[3]])!=1) {
+    if(class(depmix) != "formula" ||
+       length(depmix) != 3 ||
+       length(depmix[[3]][[2]]) != 3 ||
+       length(depmix[[3]][[3]]) != 1)
         stop("formula <",
              deparse(depmix),
              "> does not conform to required structure, ",
              "which is y ~ mixture/species + plot",sep="")
-    }    
-    yname   <- as.list(depmix)[[2]]
+    yname   <- as.character(as.list(depmix)[[2]])
     mixname <- as.character(as.list(depmix)[[3]][[2]][[2]])
     spname  <- as.character(as.list(depmix)[[3]][[2]][[3]])
     unitname<- as.character(as.list(depmix)[[3]][[3]])
 
     ## create result columns depending on partitioning scheme
-    if(scheme=="ap") {
+    if(scheme == "ap") {
         if(is.null(name.CE))
-            name.CE <- paste("CE",yname,sep=".");
+            name.CE <- paste("CE", yname, sep=".");
         if(is.null(name.SE))
-            name.SE <- paste("SE",yname,sep=".");
-    } else if(scheme=="tp") {
+            name.SE <- paste("SE", yname, sep=".");
+    } else if(scheme == "tp") {
         if(is.null(name.TIC))
-            name.TIC <- paste("TIC",yname,sep=".")
+            name.TIC <- paste("TIC", yname, sep=".")
         if(is.null(name.TDC))
-            name.TDC <- paste("TDC",yname,sep=".")
+            name.TDC <- paste("TDC", yname, sep=".")
         if(is.null(name.DOM))
-            name.DOM <- paste("DOM",yname,sep=".")
+            name.DOM <- paste("DOM", yname, sep=".")
     } else
         stop("Unknown partitioning scheme")
-    
-    col.y   <- which(names(dlist[[1]]) == yname) 
+
+    col.y   <- which(names(dlist[[1]]) == yname)
     col.mix <- which(names(dlist[[1]]) == mixname)
     col.sp  <- which(names(dlist[[1]]) == spname)
     col.unit<- which(names(dlist[[1]]) == unitname)
 
     ## process data groups
     r <-
-        myapply( 
+        myapply(
             dlist,
-            function(d) {                
+            function(d) {
                 if(!is.null(groups)) {
-                    grpcodes <- model.frame(groups,d)[1,,drop=FALSE]                    
+                    grpcodes <- model.frame(groups,d)[1,,drop=FALSE]
                     rownames(grpcodes) <- NULL
-                }               
-                d[[col.mix]] <- as.character(d[[col.mix]]);
-                d[[col.sp]]  <- as.character(d[[col.sp]]);
-                d[[col.unit]]<- as.character(d[[col.unit]]);
+                }
+                d[[col.mix]] <- as.character(d[[col.mix]])
+                d[[col.sp]]  <- as.character(d[[col.sp]])
+                d[[col.unit]]<- as.character(d[[col.unit]])
 
                 ## identify monocultures
                 dmono <-
@@ -217,20 +222,17 @@ tripart <- function(depmix,
                            function(mixref) {
                                0 == sum( sapply(d[[ col.mix ]],
                                                 function(mix) {
-                                                    mixref != mix & grepl(mix,mixref,fixed=TRUE) } )) })
-                
+                                                    mixref != mix &&
+                                                        grepl(mix, mixref, fixed=TRUE)
+                                                } ))
+                           })
+
                 ## prepare empty data frame for CE, SE
-                sepchar <- '\01'
-                comb <- unique(paste(d[[col.mix]],
-                                     d[[col.unit]],
-                                     sep = sepchar))                    
-                r <- data.frame(
-                    sapply(strsplit(comb,sepchar),function(x) x[1]),
-                    sapply(strsplit(comb,sepchar),function(x) x[2]))
+                r <- unique(d[,c(col.mix,col.unit)])                
                 names(r) <- c(mixname,unitname)
+
                 if(!is.null(groups))
-                    r <- data.frame(grpcodes,r)
-                
+                    r <- data.frame(grpcodes, r)
                 if(scheme == "ap") {
                     r[[name.CE]] <- NA
                     r[[name.SE]] <- NA
@@ -243,8 +245,9 @@ tripart <- function(depmix,
                 ## loop over all mixtures and determine CE and SE
                 for(i in seq(along = rownames(r))) {
                     ## extract all species contained in mixture
-                    sp <- sort(unique(as.character(d[[col.sp]][d[[col.mix]] == r[i,mixname]])))
-                    S <- length(sp)                                        
+                    sp <- sort(unique(as.character(
+                        d[[ col.sp ]][ d[[col.mix]] == r[i, mixname] ])))
+                    S <- length(sp)
                     if(S > 1) {
                         ## collect biomass in mixtures
                         m <- sapply(sp,
@@ -262,52 +265,52 @@ tripart <- function(depmix,
                                                 col.y ],
                                               na.rm = TRUE)
                                      })
-                        if(excl.zeroes) {  
-                            idx <- (is.na(m0) | m0 == 0)       
-                            S <- S - sum(idx)
-                            m <- m[!idx]
-                            m0 <- m0[!idx]
-                        }                        
-                        if(any(m0 == 0) || any(is.na(m0))) {
+                        if(excl.zeroes) {
+                            idx <- ( is.na(m0) | ( m0 == 0) )
+                            S <- S - sum( idx )
+                            m <- m[ ! idx ]
+                            m0 <- m0[ ! idx ]
+                        }
+                        if( any(m0 == 0) || any(is.na(m0)) ) {
                             warning("Could not calculate partitioning because at least ",
                                     "one monoculture biomass is zero, NA, or missing");
                         } else {
                             RY <- m / m0
                             RYE <- 1 / S
                             deltaRY <- RY - RYE
-                            if(length(deltaRY) > 1) {
-                                if(scheme=="ap") {
-                                    r[[i, name.CE]] <- S * mean(deltaRY)*mean(m0)
-                                    r[[i, name.SE]] <- S * .covp(deltaRY,m0)
-                                } else if(scheme=="tp") {
-                                    RYT <- sum(RY)
+                            if(length(deltaRY ) > 1) {
+                                if(scheme == "ap") {
+                                    r[[i, name.CE]] <- S * mean(deltaRY) * mean(m0)
+                                    r[[i, name.SE]] <- S * .covp(deltaRY, m0 )
+                                } else if(scheme == "tp") {
+                                    RYT <- sum( RY )
                                     r[[i, name.TIC]] <- S * mean(deltaRY) * mean(m0)
                                     r[[i, name.DOM]] <- S * .covp(RY / RYT - RYE, m0)
                                     r[[i, name.TDC]] <- S * .covp(RY - RY / RYT, m0)
                                 }
                             }
                         }
-                    } 
+                    }
                 }
                 r
             }
         )
     ## combine all groups
     r <- r[order(names(r))]
-    r <- do.call("rbind",r)    
+    r <- do.call("rbind",r)
     rownames(r) <- NULL
     r
 }
 
 ## define population covariance
-.covp <- function(x,y) {
+.covp <- function(x, y) {
     sum((x - mean(x)) * (y - mean(y))) / length(x);
 }
 
 ## convert all factors to numeric values
-.factorsToNum <- function(d)
+.columnsToNum <- function(d)
 {
-    for(v in names(d))        
-        d[[v]] <- as.numeric(as.factor(d[[v]]))
+    for(v in names(d))
+        d[[v]] <- as.numeric(as.factor( d[[v]] ))
     d
 }

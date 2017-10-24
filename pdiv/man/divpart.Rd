@@ -12,4 +12,3 @@ for net biodiversity effects (see \code{addpart} and \code{tripart}).
 \author{
 Pascal Niklaus
 }
-

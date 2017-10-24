@@ -102,17 +102,17 @@ data(divpart)
 # additive partitioning
 addpart(m ~ comp/sp+plot, data = divpart, groups = ~group)
 # tripartite partitioning
-tripart(m ~ comp/sp+plot, data = divpart, groups = ~group) 
+tripart(m ~ comp/sp+plot, data = divpart, groups = ~group)
 
+}
+\references{
+Loreau M \& Hector A (2001) Partitioning selection and
+    complementarity in biodiversity experiments. Nature 412, 72-76
+
+Fox (2005) Interpreting the selection effect of
+    biodiversity on ecosystem functioning. Ecology Letters 8,
+    846--856
 }
 \author{
 Pascal Niklaus \email{pascal.niklaus@ieu.uzh.ch}
 }
-\references{
-Loreau M \& Hector A (2001) Partitioning selection and
-complementarity in biodiversity experiments. Nature 412, 72-76
-
-Fox (2005) Interpreting the selection effect of biodiversity on
-ecosystem functioning. Ecology Letters 8, 846--856
-}
-

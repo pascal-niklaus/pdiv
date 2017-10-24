@@ -11,4 +11,3 @@ table with 10 species and three traits per species
 \author{
 Pascal Niklaus
 }
-

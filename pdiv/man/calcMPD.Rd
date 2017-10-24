@@ -76,9 +76,6 @@ calcMPD(composition.example,phylotree.example,which="dist")
 ## 109 109  37 385 385 385  97 109 109 109
 
 }
-\author{
-Pascal Niklaus \email{pascal.niklaus@ieu.uzh.ch}
-}
 \references{
 Warwick RM and Clark KR (1995) New 'biodiversity' measures
 reveal a decrease in taxonomic distinctness with increasing stress.
@@ -91,4 +88,6 @@ Mar Ecol Prog Ser 29:301-305.
 
 \code{\link{communityFromMatrix}}
 }
-
+\author{
+Pascal Niklaus \email{pascal.niklaus@ieu.uzh.ch}
+}

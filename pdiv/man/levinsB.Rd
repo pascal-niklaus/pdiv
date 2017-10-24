@@ -22,12 +22,11 @@ x <- c(0,1,2,3,2,0)
 levinsB(x)
 
 }
-\author{
-Pascal Niklaus \email{pascal.niklaus@ieu.uzh.ch}
-}
 \references{
 Levins (1968) Evolution in changing
     environments. Princeton University Press, Princeton, New
     Jersey, USA.
 }
-
+\author{
+Pascal Niklaus \email{pascal.niklaus@ieu.uzh.ch}
+}

@@ -1,13 +1,14 @@
 Package: pdiv
 Type: Package
 Title: Biodiversity-related functions
-Version: 1.4.1
-Date: 2017-02-01
+Version: 1.5
+Date: 2017-09-22
 Author: Pascal A. Niklaus
 Maintainer: Pascal A. Niklaus <Pascal.Niklaus@ieu.uzh.ch>
 Description: Functions to calculate biodiversity indices, as well as
         functional and phylogenetic diversity. Also implements additive
         and tripartite partitioning schemes.
+Imports: cluster
 Depends: R (>= 2.0.0), ape
 License: GPL (>=2)
-RoxygenNote: 5.0.1
+RoxygenNote: 6.0.1

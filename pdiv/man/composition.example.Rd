@@ -11,4 +11,3 @@ table with 8 communities and their species
 \author{
 Pascal Niklaus
 }
-

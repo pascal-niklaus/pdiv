@@ -11,4 +11,3 @@ phylogenetic tree with 20 species
 \author{
 Pascal Niklaus
 }
-

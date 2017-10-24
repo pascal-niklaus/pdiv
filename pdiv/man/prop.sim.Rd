@@ -25,11 +25,10 @@ y <- c(0,2,1,0,0,0)
 prop.sim(x,y)
 
 }
-\author{
-Pascal Niklaus \email{pascal.niklaus@ieu.uzh.ch}
-}
 \references{
 Colwell and Futuyma (1971) Measurement of niche breadth
     and overlap. Ecology 52:567--576.
 }
-
+\author{
+Pascal Niklaus \email{pascal.niklaus@ieu.uzh.ch}
+}

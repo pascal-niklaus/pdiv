@@ -11,29 +11,48 @@
 #' code. Standardized FD is equal, though.
 #' 
 #' @param communities data frame containing a column with species
-#' names and a column designating the communities (e.g. plots or other groups to compare)
+#'     names and a column designating the communities (e.g. plots or
+#'     other groups to compare)
+#'
 #' @param traits data frame containing the traits of each species
+#'
 #' @param distance the method used to calculate distances in trait
-#' space. See \code{\link{dist}} for details.
+#'     space. Options are \code{"euclidean"}, \code{"maximum"},
+#'     \code{"manhattan"}, \code{"canberra"}, \code{"binary"},
+#'     \code{"minkowski"}, and \code{"gower"}. See \code{\link{dist}}
+#'     and \code{\link{daisy}} for details.
+#'
+#' @param p power of Minkowski distance. See \code{\link{dist}} for
+#'     details.
+#'
+#' @param stand logical indicating whether the variables should be
+#'     standardized for the distance calculation (default: TRUE).
+#'
 #' @param method the agglomeration method to be used. See
-#' \code{\link{hclust}} for details.
+#'     \code{\link{hclust}} for details.
+#' 
 #' @param format indicates in which format community composition is
-#' passed. Can be either \code{default} or \code{matrix}
+#'     passed. Can be either \code{default} or \code{matrix}.
+#' 
 #' @param which indicates which results to return
-#' (\code{default="FD"}). The vector may contain any combination of
-#' \code{"FD"},\code{"stdFD"}, \code{"maxFD"}, \code{"distances"},
-#' \code{"tree"}, \code{"branches"}. \code{"FD"} indicates functional
-#' diversity (i.e. total branch length of subtree), \code{"stdFD"}
-#' standardized functional diversity (branch length divided by total
-#' tree branch length) and \code{"maxFD"} total tree branch
-#' length. \code{"distances"} also returns the calculated distance matrix,
-#' \code{"tree"} the calculated trait tree, and \code{"branches"} a list of branch
-#' indiced within the tree that connect a tip to the root.
+#'     (\code{default="FD"}). The vector may contain any combination
+#'     of \code{"FD"},\code{"stdFD"}, \code{"maxFD"},
+#'     \code{"distances"}, \code{"tree"},
+#'     \code{"branches"}. \code{"FD"} indicates functional diversity
+#'     (i.e. total branch length of subtree), \code{"stdFD"}
+#'     standardized functional diversity (branch length divided by
+#'     total tree branch length) and \code{"maxFD"} total tree branch
+#'     length. \code{"distances"} also returns the calculated distance
+#'     matrix, \code{"tree"} the calculated trait tree, and
+#'     \code{"branches"} a list of branch indiced within the tree that
+#'     connect a tip to the root.
+#' 
 #' @param shrink.tree logical indicating whether species not present
-#' in any community should be removed from the trait tree. defaults
-#' to \code{TRUE}.
+#'     in any community should be removed from the trait
+#'     tree. defaults to \code{TRUE}.
 #' 
 #' @return a list containing the items selected by \code{which}.
+#' 
 #' @seealso \code{\link{calcPD}} 
 #' @examples
 #' library(pdiv)
@@ -71,12 +90,14 @@
 #'
 #' @importFrom stats dist
 #' @importFrom stats hclust
+#' @importFrom cluster daisy
 #' @author Pascal Niklaus \email{pascal.niklaus@@ieu.uzh.ch}
 #' @importFrom ape as.phylo
 #' @export    
-calcFD <- function(communities = NULL, traits=NULL, distance="euclidean",
+calcFD <- function(communities = NULL, traits=NULL, distance="euclidean", p=2, stand=TRUE,
                    method="complete", format="default", which=c("FD"),shrink.tree=TRUE) 
 {
+    requireNamespace("cluster")
     rr <- list();
     which.options <- c("distances","tree","branches","FD","stdFD","maxFD");
     which <- which.options[ pmatch(which, which.options) ];
@@ -121,7 +142,10 @@ calcFD <- function(communities = NULL, traits=NULL, distance="euclidean",
     }
 
     ## calculate trait tree
-    distances <- dist( traits, method = distance )
+    distances <- if(distance == "gower")
+                     daisy(traits, metric = "gower", stand = stand)
+                 else 
+                     dist( if(stand) scale(traits) else traits,  method = distance )
     if("distances" %in% which)
         rr$distances <- distances
     tree <- as.phylo( hclust( distances, method=method ) )

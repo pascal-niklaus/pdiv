@@ -4,39 +4,51 @@
 \alias{calcFD}
 \title{Calculate Petchey \& Gaston's functional diversity index}
 \usage{
-calcFD(communities = NULL, traits = NULL, distance = "euclidean",
-  method = "complete", format = "default", which = c("FD"),
-  shrink.tree = TRUE)
+calcFD(communities = NULL, traits = NULL, distance = "euclidean", p = 2,
+  stand = TRUE, method = "complete", format = "default",
+  which = c("FD"), shrink.tree = TRUE)
 }
 \arguments{
 \item{communities}{data frame containing a column with species
-names and a column designating the communities (e.g. plots or other groups to compare)}
+names and a column designating the communities (e.g. plots or
+other groups to compare)}
 
 \item{traits}{data frame containing the traits of each species}
 
 \item{distance}{the method used to calculate distances in trait
-space. See \code{\link{dist}} for details.}
+space. Options are \code{"euclidean"}, \code{"maximum"},
+\code{"manhattan"}, \code{"canberra"}, \code{"binary"},
+\code{"minkowski"}, and \code{"gower"}. See \code{\link{dist}}
+and \code{\link{daisy}} for details.}
+
+\item{p}{power of Minkowski distance. See \code{\link{dist}} for
+details.}
+
+\item{stand}{logical indicating whether the variables should be
+standardized for the distance calculation (default: TRUE).}
 
 \item{method}{the agglomeration method to be used. See
 \code{\link{hclust}} for details.}
 
 \item{format}{indicates in which format community composition is
-passed. Can be either \code{default} or \code{matrix}}
+passed. Can be either \code{default} or \code{matrix}.}
 
 \item{which}{indicates which results to return
-(\code{default="FD"}). The vector may contain any combination of
-\code{"FD"},\code{"stdFD"}, \code{"maxFD"}, \code{"distances"},
-\code{"tree"}, \code{"branches"}. \code{"FD"} indicates functional
-diversity (i.e. total branch length of subtree), \code{"stdFD"}
-standardized functional diversity (branch length divided by total
-tree branch length) and \code{"maxFD"} total tree branch
-length. \code{"distances"} also returns the calculated distance matrix,
-\code{"tree"} the calculated trait tree, and \code{"branches"} a list of branch
-indiced within the tree that connect a tip to the root.}
+(\code{default="FD"}). The vector may contain any combination
+of \code{"FD"},\code{"stdFD"}, \code{"maxFD"},
+\code{"distances"}, \code{"tree"},
+\code{"branches"}. \code{"FD"} indicates functional diversity
+(i.e. total branch length of subtree), \code{"stdFD"}
+standardized functional diversity (branch length divided by
+total tree branch length) and \code{"maxFD"} total tree branch
+length. \code{"distances"} also returns the calculated distance
+matrix, \code{"tree"} the calculated trait tree, and
+\code{"branches"} a list of branch indiced within the tree that
+connect a tip to the root.}
 
 \item{shrink.tree}{logical indicating whether species not present
-in any community should be removed from the trait tree. defaults
-to \code{TRUE}.}
+in any community should be removed from the trait
+tree. defaults to \code{TRUE}.}
 }
 \value{
 a list containing the items selected by \code{which}.
@@ -82,9 +94,6 @@ calcFD(composition.example,traits.example)
 ## 1.63 1.25 1.46 2.10 0.00 0.00 0.00 0.00 
 
 }
-\author{
-Pascal Niklaus \email{pascal.niklaus@ieu.uzh.ch}
-}
 \references{
 Petchey O \& Gaston K (2006) Functional diversity: back to basics and looking forward.
 Ecology Letters 9: 741--758.
@@ -95,4 +104,6 @@ richness and community composition. Ecology Letters 5: 402--411.
 \seealso{
 \code{\link{calcPD}}
 }
-
+\author{
+Pascal Niklaus \email{pascal.niklaus@ieu.uzh.ch}
+}

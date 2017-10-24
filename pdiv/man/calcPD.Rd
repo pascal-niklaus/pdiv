@@ -55,10 +55,9 @@ calcPD(composition.example,phylotree.example)
 ## 8   8    0.0000
 
 }
-\author{
-Pascal Niklaus \email{pascal.niklaus@ieu.uzh.ch}
-}
 \seealso{
 \code{\link{calcFD}}
 }
-
+\author{
+Pascal Niklaus \email{pascal.niklaus@ieu.uzh.ch}
+}

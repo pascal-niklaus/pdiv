@@ -75,7 +75,7 @@ FD1 <- tapply(composition.example[,2], composition.example[,1],
 FD2 <- Getlength(xtree, composition.example)$FD.new
 
 
-y <- calcFD(composition.example,traits.example,which="stdFD",shrink.tree = FALSE);
+y <- calcFD(composition.example,traits.example,which="stdFD",shrink.tree = FALSE, stand=FALSE);
 
 # print(FD2);
 
