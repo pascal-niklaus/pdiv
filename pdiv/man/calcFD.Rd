@@ -90,8 +90,8 @@ traits.example
 
 calcFD(composition.example,traits.example)
 ## $FD
-##    1    2    3    4    5    6    7    8
-## 1.63 1.25 1.46 2.10 0.00 0.00 0.00 0.00 
+##     1     2     3     4     5     6     7     8
+## 6.611 3.384 4.659 8.738 0.000 0.000 0.000 0.000 
 
 }
 \references{

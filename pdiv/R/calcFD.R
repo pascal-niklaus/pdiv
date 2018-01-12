@@ -79,8 +79,8 @@
 #' 
 #' calcFD(composition.example,traits.example)
 #' ## $FD
-#' ##    1    2    3    4    5    6    7    8
-#' ## 1.63 1.25 1.46 2.10 0.00 0.00 0.00 0.00 
+#' ##     1     2     3     4     5     6     7     8
+#' ## 6.611 3.384 4.659 8.738 0.000 0.000 0.000 0.000 
 #'
 #' @references Petchey O \& Gaston K (2006) Functional diversity: back to basics and looking forward.
 #' Ecology Letters 9: 741--758.
@@ -88,10 +88,11 @@
 #' Petchey OL \& Gaston KJ (2002) Functional diversity (FD), species
 #' richness and community composition. Ecology Letters 5: 402--411.
 #'
+#' @author Pascal Niklaus \email{pascal.niklaus@@ieu.uzh.ch}
+#' 
 #' @importFrom stats dist
 #' @importFrom stats hclust
 #' @importFrom cluster daisy
-#' @author Pascal Niklaus \email{pascal.niklaus@@ieu.uzh.ch}
 #' @importFrom ape as.phylo
 #' @export    
 calcFD <- function(communities = NULL, traits=NULL, distance="euclidean", p=2, stand=TRUE,

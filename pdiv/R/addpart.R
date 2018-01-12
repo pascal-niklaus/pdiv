@@ -1,8 +1,8 @@
 #' Additive and Tripartite Partitioning
 #'
 #' Given a data set that specifies the composition of plant
-#' communities on a species basis, these functions compute Loreau and
-#' Hectors additive partitioning, or Fox' tripartite partitioning.
+#' communities on a per species basis, these functions compute Loreau and
+#' Hector's additive partitioning, or Fox' tripartite partitioning.
 #'
 #' The input data frame needs to contain columns defining the units
 #' for which complementarity and selection effects are to be
@@ -22,6 +22,15 @@
 #' additional characters as long as the above rule is met,
 #' e.g. \code{A|B|C|D} would work as well.
 #'
+#' Note: Monocultures are identified by testing if their composition
+#' codes do not contain any of the other composition codes. It
+#' therefore is crucial to include the monocultures in the data set,
+#' even if their biomass is zero or not known. Otherwise, mixtures may
+#' be misidentified as monocultures (because there are no
+#' corresponding lines for their component monocultures). Example:
+#' composition 'AB' will be treated as monoculture if no composition
+#' 'A' or 'B' are present in the data set.
+#' 
 #' Monoculture biomass (the reference for the underlying relative
 #' yield calculation) is calculated as mean of all the monoculture
 #' plots, excluding \code{NA}s.
@@ -67,6 +76,7 @@
 #'     dependent variable specified.
 #' @param excl.zeroes logical specifying whether species with unknown
 #'     or zero biomass are excluded from calculations (default \code{FALSE}).
+#'     Data that are NA are also excluded.
 #' @param groups The calculations can be performed by groups specified
 #'     with a right hand side only model formula.
 #' @return A data frame containing columns for plant species mixture,
@@ -89,7 +99,7 @@
 #'
 #' @author Pascal Niklaus \email{pascal.niklaus@@ieu.uzh.ch}
 #'
-#' @importFrom stats model.frame
+#' @importFrom stats model.frame na.pass
 #' @rdname divpartfun
 #' @export
 addpart <- function(depmix,
@@ -156,10 +166,11 @@ tripart <- function(depmix,
         if(class(groups) != "formula" || length(groups) != 2)
             stop("argument 'groups' (",deparse(groups),
                  ") should be a right-hand side formula")
-        d.grouping <- eval(model.frame(groups, d), parent.frame(2))
+        d.grouping <- eval(model.frame(groups, d, na.action=na.pass), parent.frame(2))
     }
-    d <- eval(model.frame(depmix,d), parent.frame(2))
 
+    d <- eval(model.frame(depmix, d, na.action=na.pass), parent.frame(2))
+    
     ## create list with data groups (dlist)
     if(is.null(groups))
         dlist <- list(all = d)
@@ -216,7 +227,9 @@ tripart <- function(depmix,
                 d[[col.sp]]  <- as.character(d[[col.sp]])
                 d[[col.unit]]<- as.character(d[[col.unit]])
 
-                ## identify monocultures
+                ## identify monocultures:
+                ## monocultures are the compositions that do not contain
+                ## any other composition code
                 dmono <-
                     sapply(d[[ col.mix ]],
                            function(mixref) {
@@ -226,7 +239,7 @@ tripart <- function(depmix,
                                                         grepl(mix, mixref, fixed=TRUE)
                                                 } ))
                            })
-
+                
                 ## prepare empty data frame for CE, SE
                 r <- unique(d[,c(col.mix,col.unit)])                
                 names(r) <- c(mixname,unitname)
@@ -272,7 +285,7 @@ tripart <- function(depmix,
                             m0 <- m0[ ! idx ]
                         }
                         if( any(m0 == 0) || any(is.na(m0)) ) {
-                            warning("Could not calculate partitioning because at least ",
+                            warning("Could not calculate partitioning for ",r[i, mixname], " because at least ",
                                     "one monoculture biomass is zero, NA, or missing");
                         } else {
                             RY <- m / m0

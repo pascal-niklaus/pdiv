@@ -28,7 +28,8 @@ effect. Defaults to \code{SE.y}, where \code{y} is replaced by
 the name of the dependent variable specified.}
 
 \item{excl.zeroes}{logical specifying whether species with unknown
-or zero biomass are excluded from calculations (default \code{FALSE}).}
+or zero biomass are excluded from calculations (default \code{FALSE}).
+Data that are NA are also excluded.}
 
 \item{groups}{The calculations can be performed by groups specified
 with a right hand side only model formula.}
@@ -55,8 +56,8 @@ A data frame containing columns for plant species mixture,
 }
 \description{
 Given a data set that specifies the composition of plant
-communities on a species basis, these functions compute Loreau and
-Hectors additive partitioning, or Fox' tripartite partitioning.
+communities on a per species basis, these functions compute Loreau and
+Hector's additive partitioning, or Fox' tripartite partitioning.
 }
 \details{
 The input data frame needs to contain columns defining the units
@@ -76,6 +77,15 @@ example, species \code{A} will be found in composition \code{ABCD}
 but not in \code{EFGH}. The composition codes can contain
 additional characters as long as the above rule is met,
 e.g. \code{A|B|C|D} would work as well.
+
+Note: Monocultures are identified by testing if their composition
+codes do not contain any of the other composition codes. It
+therefore is crucial to include the monocultures in the data set,
+even if their biomass is zero or not known. Otherwise, mixtures may
+be misidentified as monocultures (because there are no
+corresponding lines for their component monocultures). Example:
+composition 'AB' will be treated as monoculture if no composition
+'A' or 'B' are present in the data set.
 
 Monoculture biomass (the reference for the underlying relative
 yield calculation) is calculated as mean of all the monoculture
