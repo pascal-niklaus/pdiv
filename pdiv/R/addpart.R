@@ -41,7 +41,11 @@
 #' and selection effects will be set to \code{NA}, unless
 #' \code{excl.zeroes=TRUE} is specified. Then, these species will be
 #' removed from the species set before complementarity and selection
-#' effects are calculated.
+#' effects are calculated. The underlying relative yield data are
+#' still calculated using the original species numbers; only then
+#' are the calculated CE plus SE equal to the net effect calculated
+#' as mixture yield minus average monoculture yield (incl. the failing
+#' monoculture with zero yield).
 #'
 #' These partitioning schemes can be performed by groups
 #' (e.g. different experimental treatments or dates). These groups are
@@ -278,14 +282,14 @@ tripart <- function(depmix,
                                                 col.y ],
                                               na.rm = TRUE)
                                      })
-                        if(excl.zeroes) {
-                            idx <- ( is.na(m0) | ( m0 == 0) )
-                            S <- S - sum( idx )
-                            m <- m[ ! idx ]
-                            m0 <- m0[ ! idx ]
-                        }
+                        idx <- excl.zeroes & ( is.na(m0) | ( m0 == 0) )                        
+                        Sreduced <- S - sum( idx )
+                        m <- m[ ! idx ]
+                        m0 <- m0[ ! idx ]
+                        
                         if( any(m0 == 0) || any(is.na(m0)) ) {
-                            warning("Could not calculate partitioning for ",r[i, mixname], " because at least ",
+                            warning("Could not calculate partitioning for ",r[i, mixname],
+                                    " because at least ",
                                     "one monoculture biomass is zero, NA, or missing");
                         } else {
                             RY <- m / m0
@@ -293,13 +297,13 @@ tripart <- function(depmix,
                             deltaRY <- RY - RYE
                             if(length(deltaRY ) > 1) {
                                 if(scheme == "ap") {
-                                    r[[i, name.CE]] <- S * mean(deltaRY) * mean(m0)
-                                    r[[i, name.SE]] <- S * .covp(deltaRY, m0 )
+                                    r[[i, name.CE]] <- Sreduced * mean(deltaRY) * mean(m0)
+                                    r[[i, name.SE]] <- Sreduced * .covp(deltaRY, m0 )
                                 } else if(scheme == "tp") {
                                     RYT <- sum( RY )
-                                    r[[i, name.TIC]] <- S * mean(deltaRY) * mean(m0)
-                                    r[[i, name.DOM]] <- S * .covp(RY / RYT - RYE, m0)
-                                    r[[i, name.TDC]] <- S * .covp(RY - RY / RYT, m0)
+                                    r[[i, name.TIC]] <- Sreduced * mean(deltaRY) * mean(m0)
+                                    r[[i, name.DOM]] <- Sreduced * .covp(RY / RYT - RYE, m0)
+                                    r[[i, name.TDC]] <- Sreduced * .covp(RY - RY / RYT, m0)
                                 }
                             }
                         }

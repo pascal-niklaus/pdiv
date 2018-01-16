@@ -97,7 +97,11 @@ or unknown monoculture biomass. For such plots, the complementarity
 and selection effects will be set to \code{NA}, unless
 \code{excl.zeroes=TRUE} is specified. Then, these species will be
 removed from the species set before complementarity and selection
-effects are calculated.
+effects are calculated. The underlying relative yield data are
+still calculated using the original species numbers; only then
+are the calculated CE plus SE equal to the net effect calculated
+as mixture yield minus average monoculture yield (incl. the failing
+monoculture with zero yield).
 
 These partitioning schemes can be performed by groups
 (e.g. different experimental treatments or dates). These groups are
