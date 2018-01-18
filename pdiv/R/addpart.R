@@ -170,7 +170,7 @@ tripart <- function(depmix,
         if(class(groups) != "formula" || length(groups) != 2)
             stop("argument 'groups' (",deparse(groups),
                  ") should be a right-hand side formula")
-        d.grouping <- eval(model.frame(groups, d, na.action=na.pass), parent.frame(2))
+        d.grouping <- eval(model.frame(groups, d, na.action = na.pass), parent.frame(2))
     }
 
     d <- eval(model.frame(depmix, d, na.action=na.pass), parent.frame(2))
@@ -230,20 +230,41 @@ tripart <- function(depmix,
                 d[[col.mix]] <- as.character(d[[col.mix]])
                 d[[col.sp]]  <- as.character(d[[col.sp]])
                 d[[col.unit]]<- as.character(d[[col.unit]])
-
-                ## identify monocultures:
+               
+                ## identify monocultures and perform sanity checks
                 ## monocultures are the compositions that do not contain
                 ## any other composition code
-                dmono <-
-                    sapply(d[[ col.mix ]],
-                           function(mixref) {
-                               0 == sum( sapply(d[[ col.mix ]],
-                                                function(mix) {
-                                                    mixref != mix &&
-                                                        grepl(mix, mixref, fixed=TRUE)
-                                                } ))
-                           })
+                comps <- sort(unique(d[[col.mix]]))
+
+                monos <-
+                    sapply(
+                        comps,
+                        function(mixref)
+                            0 == sum(sapply(comps,
+                                            function(mix)
+                                                (mixref != mix) &&
+                                                grepl(mix, mixref, fixed=TRUE)))
+                    )
+
+                rich <-
+                    sapply(
+                        comps,
+                        function(mix)
+                            length(unique(d[[col.sp]][ d[[col.mix]] == mix ] ))
+                    )
+
+                if(any(rich[monos] != 1)) 
+                    stop("Monoculture(s) ",
+                         paste(paste("'",comps[monos & rich>1], "'", sep="", collapse=", ")),
+                         " contain(s) multiple species.")
                 
+                if(any(rich[!monos] == 1))
+                    warning("Mixture(s) ",
+                            paste(paste("'",comps[!monos & rich==1], "'", sep="", collapse=", ")),
+                            " contain(s) only one species.")
+                
+                dmono <- d[[ col.mix ]] %in% comps[monos]
+
                 ## prepare empty data frame for CE, SE
                 r <- unique(d[,c(col.mix,col.unit)])                
                 names(r) <- c(mixname,unitname)
@@ -277,11 +298,12 @@ tripart <- function(depmix,
                         m0 <- sapply(sp,
                                      function(sp) {
                                          mean(d[ dmono &
-                                                 grepl(sp,d[[col.mix]],
+                                                 grepl(sp, d[[col.mix]],
                                                        fixed = TRUE),
                                                 col.y ],
                                               na.rm = TRUE)
                                      })
+
                         idx <- excl.zeroes & ( is.na(m0) | ( m0 == 0) )                        
                         Sreduced <- S - sum( idx )
                         m <- m[ ! idx ]
