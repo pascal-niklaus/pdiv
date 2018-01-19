@@ -99,7 +99,7 @@ calcFD <- function(communities = NULL, traits=NULL, distance="euclidean", p=2, s
                    method="complete", format="default", which=c("FD"),shrink.tree=TRUE) 
 {
     requireNamespace("cluster")
-    rr <- list();
+    rr <- list()
     which.options <- c("distances","tree","branches","FD","stdFD","maxFD");
     which <- which.options[ pmatch(which, which.options) ];
 
@@ -161,34 +161,41 @@ calcFD <- function(communities = NULL, traits=NULL, distance="euclidean", p=2, s
         rr$branches <- branches;
 
     names(branches) <- tree$tip.label
-    branches <- .remove_common(branches);
+    branches <- .remove_common(branches)
     FDmax <- sum(tree$edge.length[unique(unlist(branches))], na.rm=TRUE)
     if("maxFD" %in% which)
-        rr$maxFD <- FDmax;
+        rr$maxFD <- FDmax
 
     if("FD" %in% which || "stdFD" %in% which) {
         r <- data.frame(com = sort(unique(as.character(communities[,com.col.com]))), FD = NA)
-        for(i in 1:nrow(r)) {
-            sp.set <- sort(unique(communities[communities[,com.col.com] == r$com[i],sp.col.com]));
-            br <- branches;
 
-            if(!all(sp.set %in% names(br))) 
-                stop("Species not found in trait tree: ",
-                     paste(sp.set[which(!(sp.set %in% names(br)))],
-                           collapse=", "));
+        r$FD <- .mysapply(
+            1:nrow(r),
+            function(i) {
+                sp.set <-
+                    sort(unique(
+                        communities[communities[,com.col.com] == r$com[i],sp.col.com]
+                    ))
+                br <- branches
 
-            br <- br[match(sp.set,names(br))]  
-            br <- .remove_common(br)
-            r$FD[i] <- sum(tree$edge.length[unique(unlist(br))],na.rm=TRUE)
-        }
+                if(!all(sp.set %in% names(br))) 
+                    stop("Species not found in trait tree: ",
+                         paste(sp.set[which(!(sp.set %in% names(br)))],
+                               collapse=", "));
+
+                br <- br[match(sp.set,names(br))]  
+                br <- .remove_common(br)
+                r$FD[i] <- sum(tree$edge.length[unique(unlist(br))],na.rm=TRUE)
+            }
+        )        
         if("FD" %in% which) {
-            rr$FD <- r$FD;
-            names(rr$FD) <- r$com;
+            rr$FD <- r$FD
+            names(rr$FD) <- r$com
         }
         if("stdFD" %in% which) {
-            rr$stdFD <- r$FD/FDmax;
-            names(rr$stdFD) <- r$com;
+            rr$stdFD <- r$FD/FDmax
+            names(rr$stdFD) <- r$com
         }
     }
-    rr;
+    rr
 }

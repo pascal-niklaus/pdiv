@@ -9,18 +9,18 @@ calcPD(communities = NULL, tree = NULL, which = c("PD"),
 }
 \arguments{
 \item{communities}{data frame containing a column with species
-names and a column designating the communities (e.g. plots or other
-groups to compare)}
+names and a column designating the communities (e.g. plots or
+other groups to compare)}
 
 \item{tree}{phylogenetic tree of class \code{phylo}}
 
 \item{which}{indicates which results to return
-(\code{default="PD"}). The vector may contain any combination of
-\code{"PD"}, \code{"maxPD"}, and \code{"branches"}. \code{"PD"}
-indicates phylogenetic diversity (i.e. total branch length of
-subtree), \code{"maxPD"} total tree branch length, and
-\code{"branches"} a list of branch indiced within the tree that
-connect a tip to the root.}
+(\code{default="PD"}). The vector may contain any combination
+of \code{"PD"}, \code{"maxPD"}, and
+\code{"branches"}. \code{"PD"} indicates phylogenetic diversity
+(i.e. total branch length of subtree), \code{"maxPD"} total
+tree branch length, and \code{"branches"} a list of branch
+indices within the tree that connect a tip to the root.}
 
 \item{format}{indicates in which format community composition is
 passed. Can be either \code{default} or \code{matrix}}

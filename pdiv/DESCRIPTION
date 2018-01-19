@@ -1,7 +1,7 @@
 Package: pdiv
 Type: Package
-Title: Biodiversity-related functions
-Version: 1.5.3
+Title: Biodiversity-Related Functions
+Version: 1.5.4
 Date: 2018-01-18
 Author: Pascal A. Niklaus
 Maintainer: Pascal A. Niklaus <Pascal.Niklaus@ieu.uzh.ch>

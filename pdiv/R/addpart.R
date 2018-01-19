@@ -56,33 +56,42 @@
 #'
 #' @param data Data frame describing the composition of plant
 #'     communities, on a per-species basis
+#' 
 #' @param depmix A 'model formula' describing the structure of the
 #'     data, in the \code{form y ~ mixture/species + plot}
+#'
 #' @param name.CE Name of column holding the calculated complemetarity
 #'     effect. Defaults to \code{CE.y}, where \code{y} is replaced by
 #'     the name of the dependent variable (usually the biomass
 #'     measure).
+#'
 #' @param name.SE Name of column holding the calculated selection
 #'     effect. Defaults to \code{SE.y}, where \code{y} is replaced by
 #'     the name of the dependent variable specified.
+#'
 #' @param name.TIC Name of column holding the calculated
 #'     trait-independent complemetarity effect. Defaults to
 #'     \code{TIC.y}, where \code{y} is replaced by the name of the
 #'     dependent variable (usually the biomass measure). Numerically
 #'     this term is identical to the complementarity effect of the
 #'     additive partitioning scheme.
+#'
 #' @param name.DOM Name of column holding the calculated selection
 #'     dominance effect. Defaults to \code{DOM.y}, where \code{y} is
 #'     replaced by the name of the dependent variable specified.
+#'
 #' @param name.TDC Name of column holding the calculated
 #'     trait-dependent complementarity effect. Defaults to
 #'     \code{TDC.y}, where \code{y} is replaced by the name of the
 #'     dependent variable specified.
+#'
 #' @param excl.zeroes logical specifying whether species with unknown
 #'     or zero biomass are excluded from calculations (default \code{FALSE}).
 #'     Data that are NA are also excluded.
+#'
 #' @param groups The calculations can be performed by groups specified
 #'     with a right hand side only model formula.
+#'
 #' @return A data frame containing columns for plant species mixture,
 #'     plot, and the computed complementarity and selection effects.
 #'
@@ -155,16 +164,6 @@ tripart <- function(depmix,
                      excl.zeroes, groups,
                      scheme)
 {
-    ## use parallelized lapply, if available (non-Windows only)
-    parallel <-
-        (Sys.info()["sysname"] != "Windows") &&
-        requireNamespace("parallel")
-    myapply <- if(parallel)
-                   function(x,fun)
-                       parallel::mclapply(x, fun, mc.cores = parallel::detectCores())
-               else
-                   lapply
-
     ## evaluate formula in caller context of addpart and tripart
     if(!is.null(groups)) {
         if(class(groups) != "formula" || length(groups) != 2)
@@ -220,7 +219,7 @@ tripart <- function(depmix,
 
     ## process data groups
     r <-
-        myapply(
+        .mylapply(
             dlist,
             function(d) {
                 if(!is.null(groups)) {
@@ -230,7 +229,7 @@ tripart <- function(depmix,
                 d[[col.mix]] <- as.character(d[[col.mix]])
                 d[[col.sp]]  <- as.character(d[[col.sp]])
                 d[[col.unit]]<- as.character(d[[col.unit]])
-               
+                
                 ## identify monocultures and perform sanity checks
                 ## monocultures are the compositions that do not contain
                 ## any other composition code
@@ -243,7 +242,7 @@ tripart <- function(depmix,
                             0 == sum(sapply(comps,
                                             function(mix)
                                                 (mixref != mix) &&
-                                                grepl(mix, mixref, fixed=TRUE)))
+                                                    grepl(mix, mixref, fixed=TRUE)))
                     )
 
                 rich <-
@@ -339,17 +338,4 @@ tripart <- function(depmix,
     r <- do.call("rbind",r)
     rownames(r) <- NULL
     r
-}
-
-## define population covariance
-.covp <- function(x, y) {
-    sum((x - mean(x)) * (y - mean(y))) / length(x);
-}
-
-## convert all factors to numeric values
-.columnsToNum <- function(d)
-{
-    for(v in names(d))
-        d[[v]] <- as.numeric(as.factor( d[[v]] ))
-    d
 }

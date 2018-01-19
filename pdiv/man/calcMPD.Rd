@@ -9,18 +9,20 @@ calcMPD(communities = NULL, tree = NULL, which = c("MPD"),
 }
 \arguments{
 \item{communities}{data frame containing a column specifying the
-communities (e.g. plots or other groups to compare), a column with
-species names, and optionally a column with species abundances.
-Species names must match the tip names in the phylogenetic tree.
-The abundances column is only used if \code{abundance = TRUE}.}
+communities (e.g. plots or other groups to compare), a column
+with species names, and optionally a column with species
+abundances.  Species names must match the tip names in the
+phylogenetic tree.  The abundances column is only used if
+\code{abundance = TRUE}.}
 
 \item{tree}{phylogenetic tree of class \code{phylo}}
 
 \item{which}{indicates which results to return
-(\code{default="MPD"}). The vector may contain 
-\code{"MPD"}, and \code{"dist"}. \code{"MPD"}
-indicates mean phylogenetic diversity (i.e. mean age of last common ancestor),
-\code{"dist"} will return the age of the last common ancestor for all pairs.}
+(\code{default="MPD"}). The vector may contain \code{"MPD"},
+and \code{"dist"}. \code{"MPD"} indicates mean phylogenetic
+diversity (i.e. mean age of last common ancestor),
+\code{"dist"} will return the age of the last common ancestor
+for all pairs.}
 
 \item{format}{indicates in which format community composition is
 passed. Can be either \code{default} or \code{matrix}.}
@@ -28,11 +30,11 @@ passed. Can be either \code{default} or \code{matrix}.}
 \item{scale}{a user-defined scale factor (default 0.5) by which the
 total branch length of the connection between a pair is
 scaled. This is useful in ultrametric trees to arrive at the
-distance to the last common ancestor since the branch length from
-both tips would be cumulated otherwise.}
+distance to the last common ancestor since the branch length
+from both tips would be cumulated otherwise.}
 
-\item{abundance}{logical indicating whether abundances are used
-to weigh the distance between each pair.}
+\item{abundance}{logical indicating whether abundances are used to
+weigh the distance between each pair.}
 }
 \value{
 a list containing the items selected by \code{which}.
@@ -77,9 +79,9 @@ calcMPD(composition.example,phylotree.example,which="dist")
 
 }
 \references{
-Warwick RM and Clark KR (1995) New 'biodiversity' measures
-reveal a decrease in taxonomic distinctness with increasing stress.
-Mar Ecol Prog Ser 29:301-305.
+Warwick RM and Clark KR (1995) New 'biodiversity'
+    measures reveal a decrease in taxonomic distinctness with
+    increasing stress.  Mar Ecol Prog Ser 29:301-305.
 }
 \seealso{
 \code{\link{calcPD}}
