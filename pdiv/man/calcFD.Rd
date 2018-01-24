@@ -5,7 +5,7 @@
 \title{Calculate Petchey \& Gaston's functional diversity index}
 \usage{
 calcFD(communities = NULL, traits = NULL, distance = "euclidean", p = 2,
-  stand = TRUE, method = "complete", format = "default",
+  stand = TRUE, stdfun = scale, method = "complete", format = "default",
   which = c("FD"), shrink.tree = TRUE)
 }
 \arguments{
@@ -25,7 +25,11 @@ and \code{\link{daisy}} for details.}
 details.}
 
 \item{stand}{logical indicating whether the variables should be
-standardized for the distance calculation (default: TRUE).}
+standardized for the distance calculation (default: TRUE).
+The default operation is a z-tranformation, but a custom
+function can be provided (stdfun).}
+
+\item{stdfun}{function used to standardize the data.}
 
 \item{method}{the agglomeration method to be used. See
 \code{\link{hclust}} for details.}

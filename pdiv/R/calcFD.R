@@ -27,6 +27,10 @@
 #'
 #' @param stand logical indicating whether the variables should be
 #'     standardized for the distance calculation (default: TRUE).
+#'     The default operation is a z-tranformation, but a custom
+#'     function can be provided (stdfun).
+#'
+#' @param stdfun function used to standardize the data.
 #'
 #' @param method the agglomeration method to be used. See
 #'     \code{\link{hclust}} for details.
@@ -95,29 +99,31 @@
 #' @importFrom cluster daisy
 #' @importFrom ape as.phylo
 #' @export    
-calcFD <- function(communities = NULL, traits=NULL, distance="euclidean", p=2, stand=TRUE,
-                   method="complete", format="default", which=c("FD"),shrink.tree=TRUE) 
+calcFD <- function(communities = NULL, traits=NULL,
+                   distance="euclidean", p=2, stand=TRUE,
+                   stdfun = scale, method="complete", format="default",
+                   which=c("FD"),shrink.tree=TRUE) 
 {
     requireNamespace("cluster")
     rr <- list()
-    which.options <- c("distances","tree","branches","FD","stdFD","maxFD");
-    which <- which.options[ pmatch(which, which.options) ];
+    which.options <- c("distances", "tree", "branches", "FD", "stdFD", "maxFD")
+    which <- which.options[ pmatch(which, which.options) ]
 
-    formats <- c("default", "matrix");
+    formats <- c("default", "matrix")
     format <- pmatch(format, formats)
     if (is.na(format)) 
         stop("invalid format for community composition")
     if (format == -1) 
         stop("ambiguous format for community composition")
 
-    communities <- as.data.frame(communities);  
+    communities <- as.data.frame(communities)
     if( format == "matrix" ) {
         rownames( communities ) <- communities[ , 1 ]
         communities <- communities[ , -1 ]
     }
     
     if("matrix" %in% format) 
-        communities <- communityFromMatrix( communities );
+        communities <- communityFromMatrix( communities )
     
     sp.col.trt <- which( colnames(traits) %in% colnames(communities) )
     if( length(sp.col.trt) == 0 ) 
@@ -129,7 +135,7 @@ calcFD <- function(communities = NULL, traits=NULL, distance="euclidean", p=2, s
     sp.col.com  <- which( colnames(communities) == sp.colname )
     com.col.com <- 3 - sp.col.com
 
-    rownames(traits) <- as.character(traits[,sp.col.trt]);
+    rownames(traits) <- as.character(traits[,sp.col.trt])
 
     ## remove all species from trait tree that are not in a community
     if(shrink.tree) {        
@@ -137,37 +143,46 @@ calcFD <- function(communities = NULL, traits=NULL, distance="euclidean", p=2, s
             match(rownames(traits),
                   as.character(communities[,sp.col.com]) )
             ))
-        traits<-traits[sp.to.keep,-sp.col.trt,drop=FALSE];
+        traits <- traits[sp.to.keep, -sp.col.trt, drop=FALSE]
     } else {
-        traits<-traits[,-sp.col.trt,drop=FALSE];
+        traits <- traits[, -sp.col.trt, drop=FALSE]
     }
 
     ## calculate trait tree
     distances <- if(distance == "gower")
-                     daisy(traits, metric = "gower", stand = stand)
-                 else 
-                     dist( if(stand) scale(traits) else traits,  method = distance )
+                     daisy(traits,
+                           metric = "gower", stand = FALSE)
+                 else {
+                     if(stand) {
+                         tmp <- rownames(traits)
+                         traits <- apply(traits, 2, stdfun)
+                         rownames(traits) <- tmp
+                     }                                              
+                     dist(traits, method = distance )
+                 }
     if("distances" %in% which)
         rr$distances <- distances
     tree <- as.phylo( hclust( distances, method=method ) )
     if("tree" %in% which)
-        rr$tree <- tree;
+        rr$tree <- tree
     
     ## walk up tree from all tips, collect edge indices
-    ntip <- length(tree$tip.label);
-    branches <- lapply(1:ntip, function(x) .walk_to_root(tree,x) ); 
+    ntip <- length(tree$tip.label)
+    branches <- lapply(1:ntip, function(x) .walk_to_root(tree,x) )
 
     if("branches" %in% which)
-        rr$branches <- branches;
+        rr$branches <- branches
 
     names(branches) <- tree$tip.label
     branches <- .remove_common(branches)
-    FDmax <- sum(tree$edge.length[unique(unlist(branches))], na.rm=TRUE)
+    FDmax <- sum(tree$edge.length[unique(unlist(branches))],
+                 na.rm=TRUE)
     if("maxFD" %in% which)
         rr$maxFD <- FDmax
 
     if("FD" %in% which || "stdFD" %in% which) {
-        r <- data.frame(com = sort(unique(as.character(communities[,com.col.com]))), FD = NA)
+        r <- data.frame(com = sort(unique(as.character(communities[,com.col.com]))),
+                        FD = NA)
 
         r$FD <- .mysapply(
             1:nrow(r),
@@ -181,7 +196,7 @@ calcFD <- function(communities = NULL, traits=NULL, distance="euclidean", p=2, s
                 if(!all(sp.set %in% names(br))) 
                     stop("Species not found in trait tree: ",
                          paste(sp.set[which(!(sp.set %in% names(br)))],
-                               collapse=", "));
+                               collapse=", "))
 
                 br <- br[match(sp.set,names(br))]  
                 br <- .remove_common(br)
