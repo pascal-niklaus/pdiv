@@ -5,11 +5,11 @@
 \alias{tripart}
 \title{Additive and Tripartite Partitioning}
 \usage{
-addpart(depmix, data, name.CE = NULL, name.SE = NULL, excl.zeroes = FALSE,
-  groups = NULL)
-
-tripart(depmix, data, name.TIC = NULL, name.TDC = NULL, name.DOM = NULL,
+addpart(depmix, data, name.CE = NULL, name.SE = NULL,
   excl.zeroes = FALSE, groups = NULL)
+
+tripart(depmix, data, name.TIC = NULL, name.TDC = NULL,
+  name.DOM = NULL, excl.zeroes = FALSE, groups = NULL)
 }
 \arguments{
 \item{depmix}{A 'model formula' describing the structure of the
