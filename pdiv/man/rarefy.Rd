@@ -2,10 +2,16 @@
 % Please edit documentation in R/rarefy.R
 \name{rarefy}
 \alias{rarefy}
+\alias{rarefy2}
+\alias{lchoose2}
 \alias{rarefy.sim}
 \title{Rarefy species diversity}
 \usage{
 rarefy(abu, size)
+
+rarefy2(abu, size)
+
+lchoose2(n, k)
 
 rarefy.sim(abu, size, nsim = 1000, se = TRUE, fun = NULL, ...)
 }
@@ -17,6 +23,8 @@ OTUs). These must be positive integers; zeroes are discarded.}
 must be smaller or equal to \code{sum(abu)}, otherwise a
 warning is issued and the result is NA. For \code{rarefy} (but
 not \code{rarefy.sim}), size may be a vector.}
+
+\item{n, k}{arguments to determine bionomial coefficient, can be fractional}
 
 \item{nsim}{number of random samples that are drawn (only
 \code{rarefy.sim}).}
@@ -40,16 +48,24 @@ rarefied richness, or a list containing rarefied richness
     \code{se=TRUE}).
 }
 \description{
-Given a vector of abundances, \code{rarefy} calculates species
-richness rarefied to a smaller sample size.  \code{rarefy.sim} is
-an alternative function that uses repeated random subsampling. It
-allows to compute a used-defined function for each subsample,
-instead of just species richness.
+Given a vector of abundances, \code{rarefy} and \code{ram_rarefy}
+calculate species richness rarefied to a smaller sample size.
+\code{rarefy.sim} is an alternative function that uses repeated
+random subsampling. It allows to compute a used-defined function
+for each subsample, instead of just species richness.
 }
 \details{
 \code{rarefy} is fast and uses a logarithmic representation of
 factorials to avoid overflow issues even for very large samples as
 they are typical in e.g. the analysis of large sequence data.
+
+\code{rarefy2} does the same but uses function \code{lchoose2}
+instead of the standard \code{lchoose} to calculate binomial
+coefficient. \code{rarefy2} has the advantage that it works for
+fractional sample sizes, which can be useful for
+interpolation. \code{lchoose2} is similar to \code{lchose} but
+accepts fractional numbers. \code{rarefy2} is slightly slower than
+\code{rarefy}.
 
 \code{rarefy.sim} takes random subsamples of the requested size. By
 default, it returns species richness and thus provides no advantage

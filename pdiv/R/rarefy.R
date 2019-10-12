@@ -1,14 +1,22 @@
 #' Rarefy species diversity
 #'
-#' Given a vector of abundances, \code{rarefy} calculates species
-#' richness rarefied to a smaller sample size.  \code{rarefy.sim} is
-#' an alternative function that uses repeated random subsampling. It
-#' allows to compute a used-defined function for each subsample,
-#' instead of just species richness.
+#' Given a vector of abundances, \code{rarefy} and \code{ram_rarefy}
+#' calculate species richness rarefied to a smaller sample size.
+#' \code{rarefy.sim} is an alternative function that uses repeated
+#' random subsampling. It allows to compute a used-defined function
+#' for each subsample, instead of just species richness.
 #'
 #' \code{rarefy} is fast and uses a logarithmic representation of
 #' factorials to avoid overflow issues even for very large samples as
 #' they are typical in e.g. the analysis of large sequence data.
+#'
+#' \code{rarefy2} does the same but uses function \code{lchoose2}
+#' instead of the standard \code{lchoose} to calculate binomial
+#' coefficient. \code{rarefy2} has the advantage that it works for
+#' fractional sample sizes, which can be useful for
+#' interpolation. \code{lchoose2} is similar to \code{lchose} but
+#' accepts fractional numbers. \code{rarefy2} is slightly slower than
+#' \code{rarefy}.
 #'
 #' \code{rarefy.sim} takes random subsamples of the requested size. By
 #' default, it returns species richness and thus provides no advantage
@@ -29,6 +37,8 @@
 #'     must be smaller or equal to \code{sum(abu)}, otherwise a
 #'     warning is issued and the result is NA. For \code{rarefy} (but
 #'     not \code{rarefy.sim}), size may be a vector.
+#'
+#' @param n,k arguments to determine bionomial coefficient, can be fractional
 #'
 #' @param se logical indicating whether a standard error of rarefied
 #'     richness should be returned (only \code{rarefy.sim}). Note that
@@ -79,6 +89,33 @@ rarefy <- function(abu, size) {
                r <- sapply(1:K, function(i) lchoose(N-abu[i], size))
                K-sum(exp(r-lchoose(N,size)))
            })
+}
+
+#' @rdname rarefy
+#' @export
+rarefy2 <- function(abu, size)
+{
+    if(!all(is.finite(abu)))
+        return(NA)
+    abu <- abu[abu > 0]
+    K <- length(abu)
+    N <- sum(abu)
+    sapply(size,
+           function(size) {
+               if(is.na(size) || size < 0  || size > N) {
+                   warning("Rarefaction must reduce sample size, returning NA!")
+                   return(NA)
+               }
+               logk <- lchoose2(N, size)
+               K- sum(sapply(1:K,
+                             function(i) exp(lchoose2(N-abu[i],size)-logk)))
+           })
+}
+
+#' @rdname rarefy
+#' @export
+lchoose2 <- function(n, k) {
+    sum(lfactorial(c(n, k, n-k)) * c(1, -1, -1))
 }
 
 #' @rdname rarefy
