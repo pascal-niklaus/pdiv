@@ -5,16 +5,26 @@
 \alias{communityFromMatrix}
 \title{Interconvert formats of community composition data}
 \usage{
-communityToMatrix(cc, column.with.community = 1,
-  column.with.species = 2, column.with.abundances = NULL,
-  keep.abundances = TRUE, community.in.column = TRUE,
-  community.column.name = "community", species.missing = 0)
+communityToMatrix(
+  cc,
+  column.with.community = 1,
+  column.with.species = 2,
+  column.with.abundances = NULL,
+  keep.abundances = TRUE,
+  community.in.column = TRUE,
+  community.column.name = "community",
+  species.missing = 0
+)
 
-communityFromMatrix(cc, column.with.community = 1,
+communityFromMatrix(
+  cc,
+  column.with.community = 1,
   columns.with.species = setdiff(1:ncol(cc), column.with.community),
-  community.column.name = if (is.na(column.with.community)) "community"
-  else colnames(cc)[column.with.community],
-  species.column.name = "species", abundance.column.name = NULL)
+  community.column.name = if (is.na(column.with.community)) "community" else
+    colnames(cc)[column.with.community],
+  species.column.name = "species",
+  abundance.column.name = NULL
+)
 }
 \arguments{
 \item{cc}{data specifying community composition. For

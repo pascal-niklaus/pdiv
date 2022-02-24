@@ -30,7 +30,7 @@
 #' corresponding lines for their component monocultures). Example:
 #' composition 'AB' will be treated as monoculture if no composition
 #' 'A' or 'B' are present in the data set.
-#' 
+#'
 #' Monoculture biomass (the reference for the underlying relative
 #' yield calculation) is calculated as mean of all the monoculture
 #' plots, excluding \code{NA}s.
@@ -56,7 +56,7 @@
 #'
 #' @param data Data frame describing the composition of plant
 #'     communities, on a per-species basis
-#' 
+#'
 #' @param depmix A 'model formula' describing the structure of the
 #'     data, in the \code{form y ~ mixture/species + plot}
 #'
@@ -89,6 +89,9 @@
 #'     or zero biomass are excluded from calculations (default \code{FALSE}).
 #'     Data that are NA are also excluded.
 #'
+#' @param fractions fraction at which species were established in the
+#'     community. Normally, this is the inverse of species richness.
+#'
 #' @param groups The calculations can be performed by groups specified
 #'     with a right hand side only model formula.
 #'
@@ -120,13 +123,14 @@ addpart <- function(depmix,
                     name.CE = NULL,
                     name.SE = NULL,
                     excl.zeroes = FALSE,
-                    groups = NULL)
-{
+                    fractions = NULL,
+                    groups = NULL) {
     .divpart(depmix = depmix,
              d = data,
              name.CE = name.CE,
              name.SE = name.SE,
              excl.zeroes = excl.zeroes,
+             fractions = fractions,
              groups = groups,
              scheme = "ap")
 }
@@ -161,9 +165,10 @@ tripart <- function(depmix,
                      name.TIC = NULL,
                      name.TDC = NULL,
                      name.DOM = NULL,
-                     excl.zeroes, groups,
-                     scheme)
-{
+                     excl.zeroes,
+                     groups = NULL,
+                     fractions = NULL,
+                     scheme) {
     ## evaluate formula in caller context of addpart and tripart
     if(!is.null(groups)) {
         if(class(groups) != "formula" || length(groups) != 2)
@@ -172,15 +177,27 @@ tripart <- function(depmix,
         d.grouping <- eval(model.frame(groups, d, na.action = na.pass), parent.frame(2))
     }
 
-    d <- eval(model.frame(depmix, d, na.action=na.pass), parent.frame(2))
-    
+    if (!is.null(fractions)) {
+        if(class(fractions) != "formula" || length(fractions) != 2)
+            stop("argument 'fractions' (",deparse(fractions),
+                 ") should be a right-hand side formula")
+        xfrac <- unlist(eval(model.frame(fractions, d, na.action = na.pass), parent.frame(2)))
+    } else {
+        xfrac <- NA
+    }
+
+    d <- data.frame(eval(model.frame(depmix, d, na.action=na.pass),
+                         parent.frame(2)),
+                    "frac__" = xfrac)
+
     ## create list with data groups (dlist)
-    if(is.null(groups))
+    if(is.null(groups)) {
         dlist <- list(all = d)
-    else
+    } else {
         dlist <- split(
             cbind(d.grouping,d),
             f = .columnsToNum(d.grouping))
+    }
 
     ## check for formula structure
     if(class(depmix) != "formula" ||
@@ -216,6 +233,7 @@ tripart <- function(depmix,
     col.mix <- which(names(dlist[[1]]) == mixname)
     col.sp  <- which(names(dlist[[1]]) == spname)
     col.unit<- which(names(dlist[[1]]) == unitname)
+    col.frac <- which(names(dlist[[1]]) == "frac__")
 
     ## process data groups
     r <-
@@ -229,7 +247,7 @@ tripart <- function(depmix,
                 d[[col.mix]] <- as.character(d[[col.mix]])
                 d[[col.sp]]  <- as.character(d[[col.sp]])
                 d[[col.unit]]<- as.character(d[[col.unit]])
-                
+
                 ## identify monocultures and perform sanity checks
                 ## monocultures are the compositions that do not contain
                 ## any other composition code
@@ -252,20 +270,20 @@ tripart <- function(depmix,
                             length(unique(d[[col.sp]][ d[[col.mix]] == mix ] ))
                     )
 
-                if(any(rich[monos] != 1)) 
+                if(any(rich[monos] != 1))
                     stop("Monoculture(s) ",
                          paste(paste("'",comps[monos & rich>1], "'", sep="", collapse=", ")),
                          " contain(s) multiple species.")
-                
+
                 if(any(rich[!monos] == 1))
                     warning("Mixture(s) ",
                             paste(paste("'",comps[!monos & rich==1], "'", sep="", collapse=", ")),
                             " contain(s) only one species.")
-                
+
                 dmono <- d[[ col.mix ]] %in% comps[monos]
 
                 ## prepare empty data frame for CE, SE
-                r <- unique(d[,c(col.mix,col.unit)])                
+                r <- unique(d[,c(col.mix,col.unit)])
                 names(r) <- c(mixname,unitname)
 
                 if(!is.null(groups))
@@ -287,12 +305,20 @@ tripart <- function(depmix,
                     S <- length(sp)
                     if(S > 1) {
                         ## collect biomass in mixtures
+                        idx <- d[[col.mix]] == r[i, mixname] & d[[col.unit]] == r[i, unitname]
                         m <- sapply(sp,
                                     function(sp) {
-                                        mean(d[ d[[col.mix]] == r[i, mixname] &
-                                                d[[col.unit]] == r[i, unitname] &
-                                                d[[col.sp]] == sp, col.y ] )
+                                        mean(d[ idx & d[[col.sp]] == sp, col.y ] )
                                     })
+                        if (!is.null(fractions)) {
+                            fracs <- sapply(sp,
+                                        function(sp) {
+                                            mean(d[ idx & d[[col.sp]] == sp, col.frac ] )
+                                        })
+                            if (abs(sum(fracs) - 1) > 1e-5)
+                                stop("sum of fractions unequal 1.0: sum(",paste(fracs,collapse=","),")=",sum(fracs))
+                        }
+
                         ## collect biomass in monocultures
                         m0 <- sapply(sp,
                                      function(sp) {
@@ -303,21 +329,22 @@ tripart <- function(depmix,
                                               na.rm = TRUE)
                                      })
 
-                        idx <- excl.zeroes & ( is.na(m0) | ( m0 == 0) )                        
+                        idx <- excl.zeroes & ( is.na(m0) | ( m0 == 0) )
                         Sreduced <- S - sum( idx )
                         m <- m[ ! idx ]
                         m0 <- m0[ ! idx ]
-                        
+
                         if( any(m0 == 0) || any(is.na(m0)) ) {
                             warning("Could not calculate partitioning for ",r[i, mixname],
                                     " because at least ",
                                     "one monoculture biomass is zero, NA, or missing");
                         } else {
                             RY <- m / m0
-                            RYE <- 1 / S
+                            RYE <- if (is.null(fractions)) 1 / S else fracs
                             deltaRY <- RY - RYE
-                            if(length(deltaRY ) > 1) {
-                                if(scheme == "ap") {
+
+                            if (length(deltaRY) > 1) {
+                                if (scheme == "ap") {
                                     r[[i, name.CE]] <- Sreduced * mean(deltaRY) * mean(m0)
                                     r[[i, name.SE]] <- Sreduced * .covp(deltaRY, m0 )
                                 } else if(scheme == "tp") {

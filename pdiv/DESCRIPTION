@@ -1,8 +1,8 @@
 Package: pdiv
 Type: Package
 Title: Biodiversity-Related Functions
-Version: 1.8
-Date: 2019-10-12
+Version: 1.10
+Date: 2022-02-18
 Author: Pascal A. Niklaus
 Maintainer: Pascal A. Niklaus <Pascal.Niklaus@ieu.uzh.ch>
 Description: Functions to calculate biodiversity indices, as well as
@@ -11,4 +11,4 @@ Description: Functions to calculate biodiversity indices, as well as
 Imports: cluster
 Depends: R (>= 2.0.0), ape
 License: GPL (>=2)
-RoxygenNote: 6.1.1
+RoxygenNote: 7.1.2

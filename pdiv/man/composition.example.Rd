@@ -4,7 +4,9 @@
 \name{composition.example}
 \alias{composition.example}
 \title{Made-up example to demonstrate calcFD, calcPD, communityToMatrix}
-\format{\code{data.frame}}
+\format{
+\code{data.frame}
+}
 \description{
 table with 8 communities and their species
 }

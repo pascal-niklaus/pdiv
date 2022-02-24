@@ -4,7 +4,9 @@
 \name{traits.example}
 \alias{traits.example}
 \title{Made-up example to demonstrate calcFD}
-\format{\code{data.frame}}
+\format{
+\code{data.frame}
+}
 \description{
 table with 10 species and three traits per species
 }

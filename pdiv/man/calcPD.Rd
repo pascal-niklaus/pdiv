@@ -4,8 +4,7 @@
 \alias{calcPD}
 \title{Calculate phylogenetic diversity}
 \usage{
-calcPD(communities = NULL, tree = NULL, which = c("PD"),
-  format = "default")
+calcPD(communities = NULL, tree = NULL, which = c("PD"), format = "default")
 }
 \arguments{
 \item{communities}{data frame containing a column with species

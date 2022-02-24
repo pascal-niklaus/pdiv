@@ -4,8 +4,14 @@
 \alias{calcMPD}
 \title{Calculate phylogenetic diversity as mean phylogenetic distance of pairs}
 \usage{
-calcMPD(communities = NULL, tree = NULL, which = c("MPD"),
-  format = "default", scale = 0.5, abundance = FALSE)
+calcMPD(
+  communities = NULL,
+  tree = NULL,
+  which = c("MPD"),
+  format = "default",
+  scale = 0.5,
+  abundance = FALSE
+)
 }
 \arguments{
 \item{communities}{data frame containing a column specifying the

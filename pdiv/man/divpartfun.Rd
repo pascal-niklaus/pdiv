@@ -5,11 +5,25 @@
 \alias{tripart}
 \title{Additive and Tripartite Partitioning}
 \usage{
-addpart(depmix, data, name.CE = NULL, name.SE = NULL,
-  excl.zeroes = FALSE, groups = NULL)
+addpart(
+  depmix,
+  data,
+  name.CE = NULL,
+  name.SE = NULL,
+  excl.zeroes = FALSE,
+  fractions = NULL,
+  groups = NULL
+)
 
-tripart(depmix, data, name.TIC = NULL, name.TDC = NULL,
-  name.DOM = NULL, excl.zeroes = FALSE, groups = NULL)
+tripart(
+  depmix,
+  data,
+  name.TIC = NULL,
+  name.TDC = NULL,
+  name.DOM = NULL,
+  excl.zeroes = FALSE,
+  groups = NULL
+)
 }
 \arguments{
 \item{depmix}{A 'model formula' describing the structure of the
@@ -30,6 +44,9 @@ the name of the dependent variable specified.}
 \item{excl.zeroes}{logical specifying whether species with unknown
 or zero biomass are excluded from calculations (default \code{FALSE}).
 Data that are NA are also excluded.}
+
+\item{fractions}{fraction at which species were established in the
+community. Normally, this is the inverse of species richness.}
 
 \item{groups}{The calculations can be performed by groups specified
 with a right hand side only model formula.}

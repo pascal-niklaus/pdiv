@@ -4,7 +4,9 @@
 \name{phylotree.example}
 \alias{phylotree.example}
 \title{Made-up example to demonstrate calcPD}
-\format{object of class \code{phylo}}
+\format{
+object of class \code{phylo}
+}
 \description{
 phylogenetic tree with 20 species
 }

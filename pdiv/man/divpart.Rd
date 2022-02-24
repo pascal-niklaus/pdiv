@@ -4,7 +4,9 @@
 \name{divpart}
 \alias{divpart}
 \title{Made-up example to demonstrate addpart and tripart}
-\format{object of class \code{data.frame}}
+\format{
+object of class \code{data.frame}
+}
 \description{
 Biomass of species in plots differing in composition. Used to demonstrate partitioning schemes
 for net biodiversity effects (see \code{addpart} and \code{tripart}).

@@ -4,9 +4,18 @@
 \alias{calcFD}
 \title{Calculate Petchey \& Gaston's functional diversity index}
 \usage{
-calcFD(communities = NULL, traits = NULL, distance = "euclidean",
-  p = 2, stand = TRUE, stdfun = scale, method = "complete",
-  format = "default", which = c("FD"), shrink.tree = TRUE)
+calcFD(
+  communities = NULL,
+  traits = NULL,
+  distance = "euclidean",
+  p = 2,
+  stand = TRUE,
+  stdfun = scale,
+  method = "complete",
+  format = "default",
+  which = c("FD"),
+  shrink.tree = TRUE
+)
 }
 \arguments{
 \item{communities}{data frame containing a column with species
