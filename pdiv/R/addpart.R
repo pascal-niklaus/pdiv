@@ -47,6 +47,16 @@
 #' as mixture yield minus average monoculture yield (incl. the failing
 #' monoculture with zero yield).
 #'
+#' For applications in which species were not initially established in
+#' the same proportions, the respective \code{fractions} can be
+#' provided. In this case, an adjustment of the biomass values is made
+#' prior to the calculations, i.e. the additive partitioning is
+#' performed as if all species were established at the same initial
+#' density. Note that then the net diversity effect CE + SE is no
+#' longer equal to the overyielding of the particular plot with the
+#' non-equal initial proportions!
+#'
+#'
 #' These partitioning schemes can be performed by groups
 #' (e.g. different experimental treatments or dates). These groups are
 #' specified as right-hand side only formula. If the code runs on a
@@ -102,9 +112,9 @@
 #'
 #' data(divpart)
 #' # additive partitioning
-#' addpart(m ~ comp/sp+plot, data = divpart, groups = ~group)
+#' addpart(m ~ comp / sp + plot, data = divpart, groups = ~group)
 #' # tripartite partitioning
-#' tripart(m ~ comp/sp+plot, data = divpart, groups = ~group)
+#' tripart(m ~ comp / sp + plot, data = divpart, groups = ~group)
 #'
 #' @references Loreau M \& Hector A (2001) Partitioning selection and
 #'     complementarity in biodiversity experiments. Nature 412, 72-76
@@ -118,22 +128,10 @@
 #' @importFrom stats model.frame na.pass
 #' @rdname divpartfun
 #' @export
-addpart <- function(depmix,
-                    data,
-                    name.CE = NULL,
-                    name.SE = NULL,
-                    excl.zeroes = FALSE,
-                    fractions = NULL,
-                    groups = NULL) {
-    .divpart(depmix = depmix,
-             d = data,
-             name.CE = name.CE,
-             name.SE = name.SE,
-             excl.zeroes = excl.zeroes,
-             fractions = fractions,
-             groups = groups,
-             scheme = "ap")
-}
+addpart <-
+    function(depmix, data, name.CE = NULL, name.SE = NULL, excl.zeroes = FALSE, fractions = NULL, groups = NULL) {
+        .divpart(depmix = depmix, d = data, name.CE = name.CE, name.SE = name.SE, excl.zeroes = excl.zeroes, fractions = fractions, groups = groups, scheme = "ap")
+    }
 
 #' @rdname divpartfun
 #' @export
@@ -170,8 +168,8 @@ tripart <- function(depmix,
                      fractions = NULL,
                      scheme) {
     ## evaluate formula in caller context of addpart and tripart
-    if(!is.null(groups)) {
-        if(class(groups) != "formula" || length(groups) != 2)
+    if (!is.null(groups)) {
+        if (class(groups) != "formula" || length(groups) != 2)
             stop("argument 'groups' (",deparse(groups),
                  ") should be a right-hand side formula")
         d.grouping <- eval(model.frame(groups, d, na.action = na.pass), parent.frame(2))
@@ -179,28 +177,28 @@ tripart <- function(depmix,
 
     if (!is.null(fractions)) {
         if(class(fractions) != "formula" || length(fractions) != 2)
-            stop("argument 'fractions' (",deparse(fractions),
+            stop("argument 'fractions' (", deparse(fractions),
                  ") should be a right-hand side formula")
         xfrac <- unlist(eval(model.frame(fractions, d, na.action = na.pass), parent.frame(2)))
     } else {
         xfrac <- NA
     }
 
-    d <- data.frame(eval(model.frame(depmix, d, na.action=na.pass),
+    d <- data.frame(eval(model.frame(depmix, d, na.action = na.pass),
                          parent.frame(2)),
                     "frac__" = xfrac)
 
     ## create list with data groups (dlist)
-    if(is.null(groups)) {
+    if (is.null(groups)) {
         dlist <- list(all = d)
     } else {
         dlist <- split(
-            cbind(d.grouping,d),
+            cbind(d.grouping, d),
             f = .columnsToNum(d.grouping))
     }
 
     ## check for formula structure
-    if(class(depmix) != "formula" ||
+    if (class(depmix) != "formula" ||
        length(depmix) != 3 ||
        length(depmix[[3]][[2]]) != 3 ||
        length(depmix[[3]][[3]]) != 1)
@@ -214,25 +212,25 @@ tripart <- function(depmix,
     unitname<- as.character(as.list(depmix)[[3]][[3]])
 
     ## create result columns depending on partitioning scheme
-    if(scheme == "ap") {
-        if(is.null(name.CE))
-            name.CE <- paste("CE", yname, sep=".");
-        if(is.null(name.SE))
-            name.SE <- paste("SE", yname, sep=".");
-    } else if(scheme == "tp") {
-        if(is.null(name.TIC))
-            name.TIC <- paste("TIC", yname, sep=".")
-        if(is.null(name.TDC))
-            name.TDC <- paste("TDC", yname, sep=".")
-        if(is.null(name.DOM))
-            name.DOM <- paste("DOM", yname, sep=".")
+    if (scheme == "ap") {
+        if (is.null(name.CE))
+            name.CE <- paste("CE", yname, sep = ".");
+        if (is.null(name.SE))
+            name.SE <- paste("SE", yname, sep = ".");
+    } else if (scheme == "tp") {
+        if (is.null(name.TIC))
+            name.TIC <- paste("TIC", yname, sep = ".")
+        if (is.null(name.TDC))
+            name.TDC <- paste("TDC", yname, sep = ".")
+        if (is.null(name.DOM))
+            name.DOM <- paste("DOM", yname, sep = ".")
     } else
         stop("Unknown partitioning scheme")
 
-    col.y   <- which(names(dlist[[1]]) == yname)
-    col.mix <- which(names(dlist[[1]]) == mixname)
-    col.sp  <- which(names(dlist[[1]]) == spname)
-    col.unit<- which(names(dlist[[1]]) == unitname)
+    col.y    <- which(names(dlist[[1]]) == yname)
+    col.mix  <- which(names(dlist[[1]]) == mixname)
+    col.sp   <- which(names(dlist[[1]]) == spname)
+    col.unit <- which(names(dlist[[1]]) == unitname)
     col.frac <- which(names(dlist[[1]]) == "frac__")
 
     ## process data groups
@@ -240,13 +238,13 @@ tripart <- function(depmix,
         .mylapply(
             dlist,
             function(d) {
-                if(!is.null(groups)) {
-                    grpcodes <- model.frame(groups,d)[1,,drop=FALSE]
+                if (!is.null(groups)) {
+                    grpcodes <- model.frame(groups, d)[1, , drop = FALSE]
                     rownames(grpcodes) <- NULL
                 }
-                d[[col.mix]] <- as.character(d[[col.mix]])
-                d[[col.sp]]  <- as.character(d[[col.sp]])
-                d[[col.unit]]<- as.character(d[[col.unit]])
+                d[[col.mix]]  <- as.character(d[[col.mix]])
+                d[[col.sp]]   <- as.character(d[[col.sp]])
+                d[[col.unit]] <- as.character(d[[col.unit]])
 
                 ## identify monocultures and perform sanity checks
                 ## monocultures are the compositions that do not contain
@@ -256,76 +254,82 @@ tripart <- function(depmix,
                 monos <-
                     sapply(
                         comps,
-                        function(mixref)
-                            0 == sum(sapply(comps,
-                                            function(mix)
-                                                (mixref != mix) &&
-                                                    grepl(mix, mixref, fixed=TRUE)))
+                        function(mixref) {
+                            0 == sum(sapply(
+                                comps,
+                                function(mix) {
+                                    (mixref != mix) &&
+                                        grepl(mix, mixref, fixed = TRUE)
+                                }
+                            ))
+                        }
                     )
 
                 rich <-
                     sapply(
                         comps,
                         function(mix)
-                            length(unique(d[[col.sp]][ d[[col.mix]] == mix ] ))
+                            length(unique(d[[col.sp]][d[[col.mix]] == mix]))
                     )
 
-                if(any(rich[monos] != 1))
+                if (any(rich[monos] != 1))
                     stop("Monoculture(s) ",
-                         paste(paste("'",comps[monos & rich>1], "'", sep="", collapse=", ")),
+                         paste(paste("'", comps[monos & rich > 1], "'", sep = "", collapse = ", ")),
                          " contain(s) multiple species.")
 
-                if(any(rich[!monos] == 1))
+                if (any(rich[!monos] == 1))
                     warning("Mixture(s) ",
-                            paste(paste("'",comps[!monos & rich==1], "'", sep="", collapse=", ")),
+                            paste(paste("'", comps[!monos & rich==1], "'", sep="", collapse=", ")),
                             " contain(s) only one species.")
 
-                dmono <- d[[ col.mix ]] %in% comps[monos]
+                dmono <- d[[col.mix]] %in% comps[monos]
 
                 ## prepare empty data frame for CE, SE
-                r <- unique(d[,c(col.mix,col.unit)])
-                names(r) <- c(mixname,unitname)
+                r <- unique(d[, c(col.mix, col.unit)])
+                names(r) <- c(mixname, unitname)
 
-                if(!is.null(groups))
+                if (!is.null(groups))
                     r <- data.frame(grpcodes, r)
-                if(scheme == "ap") {
+                if (scheme == "ap") {
                     r[[name.CE]] <- NA
                     r[[name.SE]] <- NA
-                } else if(scheme == "tp") {
+                } else if (scheme == "tp") {
                     r[[name.TIC]] <- NA
                     r[[name.TDC]] <- NA
                     r[[name.DOM]] <- NA
                 }
 
                 ## loop over all mixtures and determine CE and SE
-                for(i in seq(along = rownames(r))) {
+                for (i in seq(along = rownames(r))) {
                     ## extract all species contained in mixture
                     sp <- sort(unique(as.character(
-                        d[[ col.sp ]][ d[[col.mix]] == r[i, mixname] ])))
+                        d[[col.sp]][d[[col.mix]] == r[i, mixname]])))
                     S <- length(sp)
-                    if(S > 1) {
+                    if (S > 1) {
                         ## collect biomass in mixtures
                         idx <- d[[col.mix]] == r[i, mixname] & d[[col.unit]] == r[i, unitname]
                         m <- sapply(sp,
                                     function(sp) {
-                                        mean(d[ idx & d[[col.sp]] == sp, col.y ] )
+                                        mean(d[idx & d[[col.sp]] == sp, col.y])
                                     })
                         if (!is.null(fractions)) {
                             fracs <- sapply(sp,
                                         function(sp) {
-                                            mean(d[ idx & d[[col.sp]] == sp, col.frac ] )
+                                            mean(d[idx & d[[col.sp]] == sp, col.frac] )
                                         })
                             if (abs(sum(fracs) - 1) > 1e-5)
-                                stop("sum of fractions unequal 1.0: sum(",paste(fracs,collapse=","),")=",sum(fracs))
+                                stop("sum of fractions unequal 1.0: sum(",
+                                     paste(fracs, collapse = ","), ")=",
+                                     sum(fracs))
                         }
 
                         ## collect biomass in monocultures
                         m0 <- sapply(sp,
                                      function(sp) {
-                                         mean(d[ dmono &
+                                         mean(d[dmono &
                                                  grepl(sp, d[[col.mix]],
                                                        fixed = TRUE),
-                                                col.y ],
+                                                col.y],
                                               na.rm = TRUE)
                                      })
 
@@ -335,19 +339,21 @@ tripart <- function(depmix,
                         m0 <- m0[ ! idx ]
 
                         if( any(m0 == 0) || any(is.na(m0)) ) {
-                            warning("Could not calculate partitioning for ",r[i, mixname],
+                            warning("Could not calculate partitioning for ", r[i, mixname],
                                     " because at least ",
-                                    "one monoculture biomass is zero, NA, or missing");
+                                    "one monoculture biomass is zero, NA, or missing")
                         } else {
+                            if (!is.null(fractions))
+                                m <- m / (Sreduced * fracs)
                             RY <- m / m0
-                            RYE <- if (is.null(fractions)) 1 / S else fracs
+                            RYE <- 1 / Sreduced 
                             deltaRY <- RY - RYE
 
                             if (length(deltaRY) > 1) {
                                 if (scheme == "ap") {
                                     r[[i, name.CE]] <- Sreduced * mean(deltaRY) * mean(m0)
                                     r[[i, name.SE]] <- Sreduced * .covp(deltaRY, m0 )
-                                } else if(scheme == "tp") {
+                                } else if (scheme == "tp") {
                                     RYT <- sum( RY )
                                     r[[i, name.TIC]] <- Sreduced * mean(deltaRY) * mean(m0)
                                     r[[i, name.DOM]] <- Sreduced * .covp(RY / RYT - RYE, m0)

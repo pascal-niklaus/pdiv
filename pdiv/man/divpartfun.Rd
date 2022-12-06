@@ -120,6 +120,16 @@ are the calculated CE plus SE equal to the net effect calculated
 as mixture yield minus average monoculture yield (incl. the failing
 monoculture with zero yield).
 
+For applications in which species were not initially established in
+the same proportions, the respective \code{fractions} can be
+provided. In this case, an adjustment of the biomass values is made
+prior to the calculations, i.e. the additive partitioning is
+performed as if all species were established at the same initial
+density. Note that then the net diversity effect CE + SE is no
+longer equal to the overyielding of the particular plot with the
+non-equal initial proportions!
+
+
 These partitioning schemes can be performed by groups
 (e.g. different experimental treatments or dates). These groups are
 specified as right-hand side only formula. If the code runs on a
@@ -131,9 +141,9 @@ on different processor cores.
 
 data(divpart)
 # additive partitioning
-addpart(m ~ comp/sp+plot, data = divpart, groups = ~group)
+addpart(m ~ comp / sp + plot, data = divpart, groups = ~group)
 # tripartite partitioning
-tripart(m ~ comp/sp+plot, data = divpart, groups = ~group)
+tripart(m ~ comp / sp + plot, data = divpart, groups = ~group)
 
 }
 \references{
